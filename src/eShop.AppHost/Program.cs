@@ -16,6 +16,7 @@ var catalogDb = postgres.AddDatabase("catalogdb");
 var identityDb = postgres.AddDatabase("identitydb");
 var orderDb = postgres.AddDatabase("orderingdb");
 var webhooksDb = postgres.AddDatabase("webhooksdb");
+var reviewsDb = postgres.AddDatabase("reviewsdb");
 
 var launchProfileName = ShouldUseHttpForEndpoints() ? "http" : "https";
 
@@ -55,6 +56,11 @@ var webHooksApi = builder.AddProject<Projects.Webhooks_API>("webhooks-api")
     .WithReference(webhooksDb)
     .WithEnvironment("Identity__Url", identityEndpoint);
 
+var reviewsApi = builder.AddProject<Projects.Reviews_API>("reviews-api")
+    .WithReference(rabbitMq).WaitFor(rabbitMq)
+    .WithReference(reviewsDb)
+    .WithEnvironment("Identity__Url", identityEndpoint);
+
 // Reverse proxies
 builder.AddYarp("mobile-bff")
     .WithExternalHttpEndpoints()
@@ -71,6 +77,7 @@ var webApp = builder.AddProject<Projects.WebApp>("webapp", launchProfileName)
     .WithReference(basketApi)
     .WithReference(catalogApi)
     .WithReference(orderingApi)
+    .WithReference(reviewsApi)
     .WithReference(rabbitMq).WaitFor(rabbitMq)
     .WithEnvironment("IdentityUrl", identityEndpoint);
 
