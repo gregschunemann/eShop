@@ -1,0 +1,36 @@
+<div class="star-rating">
+    @for (int i = 1; i <= 5; i++)
+    {
+        int starIndex = i;
+        @if (Interactive)
+        {
+            <span class="star @(starIndex <= Rating ? "filled" : "")" 
+                  @onclick="() => OnStarClick(starIndex)"
+                  style="cursor: pointer;">★</span>
+        }
+        else
+        {
+            <span class="star @(starIndex <= Rating ? "filled" : "")">★</span>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Rating { get; set; }
+
+    [Parameter]
+    public bool Interactive { get; set; }
+
+    [Parameter]
+    public EventCallback<int> RatingChanged { get; set; }
+
+    private async Task OnStarClick(int rating)
+    {
+        if (Interactive)
+        {
+            Rating = rating;
+            await RatingChanged.InvokeAsync(rating);
+        }
+    }
+}

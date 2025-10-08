@@ -28,6 +28,7 @@ public static class MauiProgram
 
 
         builder.Services.AddHttpClient<CatalogService>(o => o.BaseAddress = new(MobileBffHost));
+        builder.Services.AddHttpClient<ReviewService>(o => o.BaseAddress = new(MobileBffHost));
         builder.Services.AddSingleton<WebAppComponents.Services.IProductImageUrlProvider, ProductImageUrlProvider>();
 
         return builder.Build();

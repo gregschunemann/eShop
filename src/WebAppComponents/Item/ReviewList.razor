@@ -1,0 +1,61 @@
+@using eShop.WebAppComponents.Services
+@inject IReviewService ReviewService
+
+<div class="reviews-section">
+    @if (Summary != null && Summary.TotalReviews > 0)
+    {
+        <div class="review-summary">
+            <h3>Customer Reviews</h3>
+            <div class="rating-display">
+                <StarRating Rating="@((int)Math.Round(Summary.AverageRating))" />
+                <span class="average-rating">@Summary.AverageRating.ToString("0.0")</span>
+                <span class="total-reviews">(@Summary.TotalReviews reviews)</span>
+            </div>
+        </div>
+    }
+    
+    @if (Reviews != null && Reviews.Any())
+    {
+        <div class="reviews-list">
+            @foreach (var review in Reviews)
+            {
+                <div class="review-item">
+                    <div class="review-header">
+                        <StarRating Rating="@review.Rating" />
+                        <span class="review-date">@review.CreatedDate.ToShortDateString()</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(review.ReviewText))
+                    {
+                        <p class="review-text">@review.ReviewText</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else if (isLoaded && (Reviews == null || !Reviews.Any()))
+    {
+        <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public int ProductId { get; set; }
+
+    private IEnumerable<Review>? Reviews { get; set; }
+    private ReviewSummary? Summary { get; set; }
+    private bool isLoaded;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadReviewsAsync();
+    }
+
+    public async Task LoadReviewsAsync()
+    {
+        isLoaded = false;
+        Reviews = await ReviewService.GetReviewsByProductIdAsync(ProductId);
+        Summary = await ReviewService.GetProductReviewSummaryAsync(ProductId);
+        isLoaded = true;
+    }
+}

@@ -1,0 +1,10 @@
+global using eShop.Reviews.API.Application.Behaviors;
+global using eShop.Reviews.API.Application.Commands;
+global using eShop.Reviews.API.Application.Models;
+global using eShop.Reviews.API.Application.Queries;
+global using eShop.Reviews.API.Infrastructure;
+global using eShop.EventBus.Abstractions;
+global using eShop.EventBus.Extensions;
+global using eShop.ServiceDefaults;
+global using MediatR;
+global using Microsoft.EntityFrameworkCore;
