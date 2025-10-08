@@ -34,6 +34,7 @@ jobs:
           dotnet-version: |
             8.x.x
             9.x.x
+            10.0.100-rc.1.25451.107
 
       - name: Azure Login
         uses: azure/login@v2
