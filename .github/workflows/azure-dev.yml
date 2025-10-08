@@ -36,12 +36,7 @@ jobs:
             9.x.x
             10.0.100-rc.1.25451.107
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
 
       - name: Log in with Azure (Federated Credentials)
         run: |
