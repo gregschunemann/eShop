@@ -179,6 +179,7 @@ internal static class Extensions
     public static IResourceBuilder<YarpResource> ConfigureMobileBffRoutes(this IResourceBuilder<YarpResource> builder,
         IResourceBuilder<ProjectResource> catalogApi,
         IResourceBuilder<ProjectResource> orderingApi,
+        IResourceBuilder<ProjectResource> reviewsApi,
         IResourceBuilder<ProjectResource> identityApi)
     {
         return builder.WithConfiguration(yarp =>
@@ -235,6 +236,10 @@ internal static class Extensions
 
             // Ordering routes
             yarp.AddRoute("/api/orders/{*any}", orderingApi.GetEndpoint("http"))
+                .WithMatchRouteQueryParameter([new() { Name = "api-version", Values = ["1.0", "1"], Mode = QueryParameterMatchMode.Exact }]);
+
+            // Reviews routes
+            yarp.AddRoute("/api/reviews/{*any}", reviewsApi.GetEndpoint("http"))
                 .WithMatchRouteQueryParameter([new() { Name = "api-version", Values = ["1.0", "1"], Mode = QueryParameterMatchMode.Exact }]);
 
             // Identity routes

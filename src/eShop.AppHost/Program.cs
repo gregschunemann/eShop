@@ -64,7 +64,7 @@ var reviewsApi = builder.AddProject<Projects.Reviews_API>("reviews-api")
 // Reverse proxies
 builder.AddYarp("mobile-bff")
     .WithExternalHttpEndpoints()
-    .ConfigureMobileBffRoutes(catalogApi, orderingApi, identityApi);
+    .ConfigureMobileBffRoutes(catalogApi, orderingApi, reviewsApi, identityApi);
 
 // Apps
 var webhooksClient = builder.AddProject<Projects.WebhookClient>("webhooksclient", launchProfileName)

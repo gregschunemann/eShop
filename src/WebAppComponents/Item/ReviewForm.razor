@@ -1,0 +1,106 @@
+@using eShop.WebAppComponents.Services
+@inject IReviewService ReviewService
+
+<div class="review-form">
+    <h4>Write a Review</h4>
+    
+    <EditForm Model="@reviewRequest" OnValidSubmit="@HandleSubmit" FormName="review-form">
+        <DataAnnotationsValidator />
+        <AntiforgeryToken />
+        
+        <div class="form-group">
+            <label>Rating</label>
+            <StarRating Rating="@selectedRating" Interactive="true" RatingChanged="@OnRatingChanged" />
+            <ValidationMessage For="@(() => reviewRequest.Rating)" />
+        </div>
+        
+        <div class="form-group">
+            <label for="reviewText">Review (Optional)</label>
+            <InputTextArea id="reviewText" class="form-control" @bind-Value="reviewRequest.ReviewText" 
+                          rows="4" maxlength="2000" placeholder="Share your thoughts about this product..." />
+            <ValidationMessage For="@(() => reviewRequest.ReviewText)" />
+        </div>
+        
+        <div class="form-actions">
+            @if (isSubmitting)
+            {
+                <button type="button" class="btn btn-primary" disabled>
+                    Submitting...
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary" disabled="@(selectedRating == 0)">
+                    Submit Review
+                </button>
+            }
+        </div>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-2">@errorMessage</div>
+        }
+        
+        @if (submitSuccess)
+        {
+            <div class="alert alert-success mt-2">Thank you! Your review has been submitted.</div>
+        }
+    </EditForm>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public int ProductId { get; set; }
+
+    [Parameter]
+    public EventCallback OnReviewSubmitted { get; set; }
+
+    private CreateReviewRequest reviewRequest = new(0, 0, null);
+    private int selectedRating;
+    private bool isSubmitting;
+    private bool submitSuccess;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        reviewRequest = new CreateReviewRequest(ProductId, 0, null);
+    }
+
+    private void OnRatingChanged(int rating)
+    {
+        selectedRating = rating;
+        reviewRequest = reviewRequest with { Rating = rating };
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (selectedRating == 0)
+        {
+            errorMessage = "Please select a rating";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+        submitSuccess = false;
+
+        try
+        {
+            await ReviewService.CreateReviewAsync(reviewRequest);
+            submitSuccess = true;
+            
+            selectedRating = 0;
+            reviewRequest = new CreateReviewRequest(ProductId, 0, null);
+            
+            await OnReviewSubmitted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to submit review: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

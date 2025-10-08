@@ -51,6 +51,13 @@
             }
         </div>
     </div>
+
+    <ReviewList ProductId="@ItemId" @ref="reviewListRef" />
+
+    @if (isLoggedIn)
+    {
+        <ReviewForm ProductId="@ItemId" OnReviewSubmitted="@HandleReviewSubmitted" />
+    }
 }
 else if (notFound)
 {
@@ -65,6 +72,7 @@ else if (notFound)
     private int numInCart;
     private bool isLoggedIn;
     private bool notFound;
+    private ReviewList? reviewListRef;
 
     [Parameter]
     public int ItemId { get; set; }
@@ -106,5 +114,13 @@ else if (notFound)
     {
         var items = await BasketState.GetBasketItemsAsync();
         numInCart = items.FirstOrDefault(row => row.ProductId == ItemId)?.Quantity ?? 0;
+    }
+
+    private async Task HandleReviewSubmitted()
+    {
+        if (reviewListRef != null)
+        {
+            await reviewListRef.LoadReviewsAsync();
+        }
     }
 }
