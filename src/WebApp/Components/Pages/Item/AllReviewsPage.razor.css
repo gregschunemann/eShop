@@ -1,0 +1,73 @@
+.all-reviews {
+    padding: 0 5rem 2rem 10rem;
+    max-width: 50rem;
+}
+
+.reviews-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    color: #333;
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    color: #000;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-links {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+.page-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.page-links a:hover {
+    background-color: #f3f4f6;
+}
+
+.page-links a.active-page {
+    background-color: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.no-reviews {
+    color: #666;
+    font-style: italic;
+}
+
+@media only screen and (max-width: 480px) {
+    .all-reviews {
+        padding: 1rem;
+    }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 1024px) {
+    .all-reviews {
+        padding: 1rem 3rem;
+    }
+}

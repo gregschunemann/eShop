@@ -1,0 +1,92 @@
+@page "/item/{itemId:int}/reviews"
+@using System.Net
+@using eShop.WebAppComponents.Catalog
+@inject CatalogService CatalogService
+@inject NavigationManager Nav
+@inject IProductImageUrlProvider ProductImages
+
+@if (item is not null)
+{
+    <PageTitle>Reviews - @item.Name | AdventureWorks</PageTitle>
+    <SectionContent SectionName="page-header-title">Reviews for @item.Name</SectionContent>
+
+    <div class="all-reviews">
+        <div class="reviews-header">
+            <a class="back-link" href="/item/@ItemId">&larr; Back to product</a>
+            <StarRating AverageRating="@item.AverageRating" ReviewCount="@item.ReviewCount" Size="24" />
+        </div>
+
+        @if (reviews is not null)
+        {
+            @if (reviews.Data.Count > 0)
+            {
+                <div class="reviews-list">
+                    @foreach (var review in reviews.Data)
+                    {
+                        <ReviewCard Review="@review" />
+                    }
+                </div>
+
+                @if (reviews.Count > PageSize)
+                {
+                    <div class="page-links">
+                        @for (int i = 0; i < Math.Ceiling((double)reviews.Count / PageSize); i++)
+                        {
+                            var pageIndex = i;
+                            <a class="@(pageIndex == (Page ?? 0) ? "active-page" : "")"
+                               href="@Nav.GetUriWithQueryParameter("page", pageIndex == 0 ? null : pageIndex)">
+                                @(pageIndex + 1)
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="no-reviews">No reviews yet for this product.</p>
+            }
+        }
+        else
+        {
+            <p>Loading reviews...</p>
+        }
+    </div>
+}
+else if (notFound)
+{
+    <SectionContent SectionName="page-header-title">Not found</SectionContent>
+    <div class="all-reviews">
+        <p>Sorry, we couldn't find any such product.</p>
+    </div>
+}
+
+@code {
+    const int PageSize = 10;
+
+    private CatalogItem? item;
+    private PaginatedReviewsDto? reviews;
+    private bool notFound;
+
+    [Parameter]
+    public int ItemId { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? Page { get; set; }
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            item = await CatalogService.GetCatalogItem(ItemId);
+            reviews = await CatalogService.GetReviews(ItemId, Page ?? 0, PageSize);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            HttpContext!.Response.StatusCode = 404;
+            notFound = true;
+        }
+    }
+}

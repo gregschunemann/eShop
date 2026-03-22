@@ -1,0 +1,86 @@
+@namespace eShop.WebAppComponents.Catalog
+@using eShop.WebAppComponents.Services
+@inject ICatalogService CatalogService
+
+<div class="review-form">
+    @if (!IsLoggedIn)
+    {
+        <p class="login-prompt">Log in to leave a review.</p>
+    }
+    else
+    {
+        <h3>@(ExistingReview is not null ? "Update your review" : "Write a review")</h3>
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="review-success">@successMessage</div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="review-error">@errorMessage</div>
+        }
+
+        <div class="rating-selector">
+            <label>Your rating:</label>
+            <StarRating Interactive="true" @bind-SelectedRating="selectedRating" Size="28" />
+        </div>
+
+        <div class="text-input">
+            <label for="review-text">Review (optional):</label>
+            <textarea id="review-text" @bind="reviewText" maxlength="2000"
+                      placeholder="Share your thoughts about this product..."></textarea>
+            <span class="char-count">@(reviewText?.Length ?? 0) / 2000</span>
+        </div>
+
+        <button class="submit-button" @onclick="SubmitAsync" disabled="@(selectedRating == 0 || isSubmitting)">
+            @(isSubmitting ? "Submitting..." : (ExistingReview is not null ? "Update review" : "Submit review"))
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public int ItemId { get; set; }
+    [Parameter] public bool IsLoggedIn { get; set; }
+    [Parameter] public ReviewDto? ExistingReview { get; set; }
+    [Parameter] public EventCallback OnReviewSubmitted { get; set; }
+
+    private int selectedRating;
+    private string? reviewText;
+    private bool isSubmitting;
+    private string? successMessage;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        if (ExistingReview is not null && selectedRating == 0)
+        {
+            selectedRating = ExistingReview.Rating;
+            reviewText = ExistingReview.ReviewText;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (selectedRating < 1 || selectedRating > 5) return;
+
+        isSubmitting = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            await CatalogService.SubmitReview(ItemId, selectedRating, reviewText);
+            successMessage = "Review submitted successfully!";
+            await OnReviewSubmitted.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            errorMessage = "Failed to submit review. Please try again.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

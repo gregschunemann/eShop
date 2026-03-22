@@ -64,4 +64,33 @@ public class CatalogService(HttpClient httpClient) : ICatalogService
 
         return $"{baseUri}items?{filterQs}pageIndex={pageIndex}&pageSize={pageSize}";
     }
+
+    public async Task<PaginatedReviewsDto> GetReviews(int itemId, int pageIndex = 0, int pageSize = 10)
+    {
+        var uri = $"{remoteServiceBaseUrl}items/{itemId}/reviews?pageIndex={pageIndex}&pageSize={pageSize}";
+        var result = await httpClient.GetFromJsonAsync<PaginatedReviewsDto>(uri);
+        return result!;
+    }
+
+    public async Task<ReviewDto?> GetUserReview(int itemId)
+    {
+        var uri = $"{remoteServiceBaseUrl}items/{itemId}/reviews/user";
+        try
+        {
+            return await httpClient.GetFromJsonAsync<ReviewDto>(uri);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    public async Task<ReviewDto?> SubmitReview(int itemId, int rating, string? reviewText)
+    {
+        var uri = $"{remoteServiceBaseUrl}items/{itemId}/reviews";
+        var request = new CreateReviewRequest(rating, reviewText);
+        var response = await httpClient.PostAsJsonAsync(uri, request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ReviewDto>();
+    }
 }

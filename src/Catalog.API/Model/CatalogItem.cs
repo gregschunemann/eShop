@@ -44,21 +44,31 @@ public class CatalogItem
     /// </summary>
     public bool OnReorder { get; set; }
 
+    /// <summary>
+    /// Denormalized average star rating across all reviews (1-5). Default 0 means no reviews.
+    /// </summary>
+    public double AverageRating { get; set; }
+
+    /// <summary>
+    /// Denormalized total number of reviews for this item.
+    /// </summary>
+    public int ReviewCount { get; set; }
+
     public CatalogItem(string name) { Name = name; }
 
 
     /// <summary>
     /// Decrements the quantity of a particular item in inventory and ensures the restockThreshold hasn't
-    /// been breached. If so, a RestockRequest is generated in CheckThreshold. 
-    /// 
-    /// If there is sufficient stock of an item, then the integer returned at the end of this call should be the same as quantityDesired. 
+    /// been breached. If so, a RestockRequest is generated in CheckThreshold.
+    ///
+    /// If there is sufficient stock of an item, then the integer returned at the end of this call should be the same as quantityDesired.
     /// In the event that there is not sufficient stock available, the method will remove whatever stock is available and return that quantity to the client.
     /// In this case, it is the responsibility of the client to determine if the amount that is returned is the same as quantityDesired.
-    /// It is invalid to pass in a negative number. 
+    /// It is invalid to pass in a negative number.
     /// </summary>
     /// <param name="quantityDesired"></param>
     /// <returns>int: Returns the number actually removed from stock. </returns>
-    /// 
+    ///
     public int RemoveStock(int quantityDesired)
     {
         if (AvailableStock == 0)
@@ -91,7 +101,7 @@ public class CatalogItem
         if ((this.AvailableStock + quantity) > this.MaxStockThreshold)
         {
             // For now, this method only adds new units up maximum stock threshold. In an expanded version of this application, we
-            //could include tracking for the remaining units and store information about overstock elsewhere. 
+            //could include tracking for the remaining units and store information about overstock elsewhere.
             this.AvailableStock += (this.MaxStockThreshold - this.AvailableStock);
         }
         else
