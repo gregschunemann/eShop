@@ -35,6 +35,8 @@ public static class Extensions
             .AddApiVersion(2.0)
             .AddAuthToken();
 
+        builder.Services.AddScoped<ICatalogService>(sp => sp.GetRequiredService<CatalogService>());
+
         builder.Services.AddHttpClient<OrderingService>(o => o.BaseAddress = new("https+http://ordering-api"))
             .AddApiVersion(1.0)
             .AddAuthToken();

@@ -49,15 +49,20 @@
     margin-left: auto;
 }
 
-
-@media only screen and (max-width: 480px) { 
-    .catalog-item {
-        flex-basis: calc(100% - 2rem);
-    }    
+.catalog-product-rating {
+    display: block;
+    padding: 0 0.75rem 0.5rem 0.75rem;
 }
 
-@media only screen and (min-width: 481px) and (max-width: 1024px) { 
+
+@media only screen and (max-width: 480px) {
+    .catalog-item {
+        flex-basis: calc(100% - 2rem);
+    }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 1024px) {
     .catalog-item {
         flex-basis: calc(50% - 3rem);
-    }    
+    }
 }

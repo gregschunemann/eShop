@@ -54,22 +54,57 @@ a {
     color: black;
 }
 
-@media only screen and (max-width: 480px) { 
+.reviews-section {
+    padding: 2rem 10rem 2rem 10rem;
+    max-width: 50rem;
+}
+
+.reviews-section h2 {
+    font-size: 1.3rem;
+    margin: 0 0 1rem 0;
+}
+
+.see-all-reviews {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #333;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.see-all-reviews:hover {
+    color: #000;
+}
+
+.no-reviews {
+    color: #666;
+    font-style: italic;
+}
+
+@media only screen and (max-width: 480px) {
     .item-details {
         padding: 1.5rem 1rem 0 1rem;
         flex-direction: column;
         gap: 1rem;
-    }    
+    }
 
     .item-details img {
         width: 100%;
         max-width: none;
     }
+
+    .reviews-section {
+        padding: 1.5rem 1rem;
+    }
 }
 
-@media only screen and (min-width: 481px) and (max-width: 1024px) { 
+@media only screen and (min-width: 481px) and (max-width: 1024px) {
     .item-details {
         gap: 1rem;
         padding: 0 3rem 0 3rem;
-    }    
+    }
+
+    .reviews-section {
+        padding: 1.5rem 3rem;
+    }
 }

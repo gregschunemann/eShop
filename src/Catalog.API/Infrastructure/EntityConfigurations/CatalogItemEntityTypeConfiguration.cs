@@ -20,5 +20,11 @@ class CatalogItemEntityTypeConfiguration
             .WithMany();
 
         builder.HasIndex(ci => ci.Name);
+
+        builder.Property(ci => ci.AverageRating)
+            .HasDefaultValue(0d);
+
+        builder.Property(ci => ci.ReviewCount)
+            .HasDefaultValue(0);
     }
 }

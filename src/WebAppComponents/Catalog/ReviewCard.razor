@@ -1,0 +1,18 @@
+@namespace eShop.WebAppComponents.Catalog
+
+<div class="review-card">
+    <div class="review-header">
+        <StarRating AverageRating="@Review.Rating" ShowCount="false" Size="16" Compact="true" />
+        <span class="review-author">@Review.UserName</span>
+        <span class="review-date">@Review.CreatedAt.ToString("MMM d, yyyy")</span>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Review.ReviewText))
+    {
+        <p class="review-text">@Review.ReviewText</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required ReviewDto Review { get; set; }
+}

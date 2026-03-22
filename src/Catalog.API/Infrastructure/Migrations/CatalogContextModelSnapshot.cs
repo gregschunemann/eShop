@@ -3,9 +3,9 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using eShop.Catalog.API.Infrastructure;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pgvector;
+using eShop.Catalog.API.Infrastructure;
 
 #nullable disable
 
@@ -18,7 +18,7 @@ namespace eShop.Catalog.API.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0-rtm.23512.13")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "vector");
@@ -53,6 +53,11 @@ namespace eShop.Catalog.API.Infrastructure.Migrations
                     b.Property<int>("AvailableStock")
                         .HasColumnType("integer");
 
+                    b.Property<double>("AverageRating")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0);
+
                     b.Property<int>("CatalogBrandId")
                         .HasColumnType("integer");
 
@@ -85,6 +90,11 @@ namespace eShop.Catalog.API.Infrastructure.Migrations
                     b.Property<int>("RestockThreshold")
                         .HasColumnType("integer");
 
+                    b.Property<int>("ReviewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.HasKey("Id");
 
                     b.HasIndex("CatalogBrandId");
@@ -112,6 +122,51 @@ namespace eShop.Catalog.API.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CatalogType", (string)null);
+                });
+
+            modelBuilder.Entity("eShop.Catalog.API.Model.ProductReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CatalogItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatalogItemId", "CreatedAt")
+                        .IsDescending(false, true);
+
+                    b.HasIndex("CatalogItemId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("product_reviews", (string)null);
                 });
 
             modelBuilder.Entity("eShop.IntegrationEventLogEF.IntegrationEventLogEntry", b =>
@@ -162,6 +217,15 @@ namespace eShop.Catalog.API.Infrastructure.Migrations
                     b.Navigation("CatalogBrand");
 
                     b.Navigation("CatalogType");
+                });
+
+            modelBuilder.Entity("eShop.Catalog.API.Model.ProductReview", b =>
+                {
+                    b.HasOne("eShop.Catalog.API.Model.CatalogItem", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

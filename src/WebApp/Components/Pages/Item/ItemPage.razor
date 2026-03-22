@@ -1,5 +1,6 @@
 ﻿@page "/item/{itemId:int}"
 @using System.Net
+@using eShop.WebAppComponents.Catalog
 @inject CatalogService CatalogService
 @inject BasketState BasketState
 @inject NavigationManager Nav
@@ -18,6 +19,7 @@
             <p>
                 Brand: <strong>@item.CatalogBrand?.Brand</strong>
             </p>
+            <StarRating AverageRating="@item.AverageRating" ReviewCount="@item.ReviewCount" />
             <form class="add-to-cart" method="post" @formname="add-to-cart" @onsubmit="@AddToCartAsync" data-enhance="@isLoggedIn">
                 <AntiforgeryToken />
                 <span class="price">$@item.Price.ToString("0.00")</span>
@@ -51,6 +53,31 @@
             }
         </div>
     </div>
+
+    <div class="reviews-section">
+        <h2>Reviews</h2>
+
+        @if (recentReviews is not null && recentReviews.Data.Count > 0)
+        {
+            @foreach (var review in recentReviews.Data)
+            {
+                <ReviewCard Review="@review" />
+            }
+
+            @if (recentReviews.Count > 3)
+            {
+                <a class="see-all-reviews" href="/item/@ItemId/reviews">
+                    See all ratings and reviews (@recentReviews.Count total) &rarr;
+                </a>
+            }
+        }
+        else
+        {
+            <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
+        }
+
+        <ReviewForm ItemId="@ItemId" IsLoggedIn="@isLoggedIn" ExistingReview="@userReview" OnReviewSubmitted="OnReviewSubmitted" />
+    </div>
 }
 else if (notFound)
 {
@@ -65,6 +92,8 @@ else if (notFound)
     private int numInCart;
     private bool isLoggedIn;
     private bool notFound;
+    private PaginatedReviewsDto? recentReviews;
+    private ReviewDto? userReview;
 
     [Parameter]
     public int ItemId { get; set; }
@@ -79,12 +108,38 @@ else if (notFound)
             isLoggedIn = HttpContext?.User.Identity?.IsAuthenticated == true;
             item = await CatalogService.GetCatalogItem(ItemId);
             await UpdateNumInCartAsync();
+            await LoadReviewsAsync();
         }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             HttpContext!.Response.StatusCode = 404;
             notFound = true;
         }
+    }
+
+    private async Task LoadReviewsAsync()
+    {
+        try
+        {
+            recentReviews = await CatalogService.GetReviews(ItemId, 0, 3);
+        }
+        catch { /* Reviews are non-critical — fail silently */ }
+
+        if (isLoggedIn)
+        {
+            try
+            {
+                userReview = await CatalogService.GetUserReview(ItemId);
+            }
+            catch { /* User review lookup is non-critical */ }
+        }
+    }
+
+    private async Task OnReviewSubmitted()
+    {
+        // Reload the item (for updated AverageRating/ReviewCount) and reviews
+        item = await CatalogService.GetCatalogItem(ItemId);
+        await LoadReviewsAsync();
     }
 
     private async Task AddToCartAsync()

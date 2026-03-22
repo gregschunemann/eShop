@@ -10,6 +10,12 @@
             <span class='name'>@Item.Name</span>
             <span class='price'>$@Item.Price.ToString("0.00")</span>
         </span>
+        @if (Item.ReviewCount > 0)
+        {
+            <span class='catalog-product-rating'>
+                <StarRating AverageRating="@Item.AverageRating" ReviewCount="@Item.ReviewCount" Compact="true" Size="14" />
+            </span>
+        }
     </a>
 </div>
 

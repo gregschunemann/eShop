@@ -12,5 +12,8 @@ namespace eShop.WebAppComponents.Services
         Task<CatalogResult> GetCatalogItemsWithSemanticRelevance(int page, int take, string text);
         Task<IEnumerable<CatalogBrand>> GetBrands();
         Task<IEnumerable<CatalogItemType>> GetTypes();
+        Task<PaginatedReviewsDto> GetReviews(int itemId, int pageIndex = 0, int pageSize = 10);
+        Task<ReviewDto?> GetUserReview(int itemId);
+        Task<ReviewDto?> SubmitReview(int itemId, int rating, string? reviewText);
     }
 }

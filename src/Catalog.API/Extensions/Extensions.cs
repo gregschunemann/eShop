@@ -12,6 +12,8 @@ public static class Extensions
             return;
         }
 
+        builder.AddDefaultAuthentication();
+
         builder.AddNpgsqlDbContext<CatalogContext>("catalogdb", configureDbContextOptions: dbContextOptionsBuilder =>
         {
             dbContextOptionsBuilder.UseNpgsql(builder =>
