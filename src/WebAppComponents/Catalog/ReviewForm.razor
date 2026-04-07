@@ -1,6 +1,9 @@
 @namespace eShop.WebAppComponents.Catalog
 @using eShop.WebAppComponents.Services
-@inject ICatalogService CatalogService
+@using Microsoft.AspNetCore.Components.Web
+@rendermode RenderMode.InteractiveServer
+@inject CatalogService CatalogService
+@inject NavigationManager Nav
 
 <div class="review-form">
     @if (!IsLoggedIn)
@@ -43,7 +46,6 @@
     [Parameter, EditorRequired] public int ItemId { get; set; }
     [Parameter] public bool IsLoggedIn { get; set; }
     [Parameter] public ReviewDto? ExistingReview { get; set; }
-    [Parameter] public EventCallback OnReviewSubmitted { get; set; }
 
     private int selectedRating;
     private string? reviewText;
@@ -72,7 +74,7 @@
         {
             await CatalogService.SubmitReview(ItemId, selectedRating, reviewText);
             successMessage = "Review submitted successfully!";
-            await OnReviewSubmitted.InvokeAsync();
+            Nav.NavigateTo(Nav.Uri, forceLoad: true);
         }
         catch (Exception)
         {

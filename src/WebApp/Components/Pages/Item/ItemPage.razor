@@ -76,7 +76,7 @@
             <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
         }
 
-        <ReviewForm ItemId="@ItemId" IsLoggedIn="@isLoggedIn" ExistingReview="@userReview" OnReviewSubmitted="OnReviewSubmitted" />
+        <ReviewForm ItemId="@ItemId" IsLoggedIn="@isLoggedIn" ExistingReview="@userReview" />
     </div>
 }
 else if (notFound)
@@ -133,13 +133,6 @@ else if (notFound)
             }
             catch { /* User review lookup is non-critical */ }
         }
-    }
-
-    private async Task OnReviewSubmitted()
-    {
-        // Reload the item (for updated AverageRating/ReviewCount) and reviews
-        item = await CatalogService.GetCatalogItem(ItemId);
-        await LoadReviewsAsync();
     }
 
     private async Task AddToCartAsync()
